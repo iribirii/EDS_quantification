@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eds_cubetools module &mdash; Electron Density Shift (EDS) quantification 1.0 documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="eds_quantification module" href="eds_quantification.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Electron Density Shift (EDS) quantification
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">scr</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="eds_quantification.html">eds_quantification module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">eds_cubetools module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Electron Density Shift (EDS) quantification</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">scr</a></li>
+      <li class="breadcrumb-item active">eds_cubetools module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/eds_cubetools.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="module-eds_cubetools">
+<span id="eds-cubetools-module"></span><h1>eds_cubetools module<a class="headerlink" href="#module-eds_cubetools" title="Permalink to this headline"></a></h1>
+<dl class="py class">
+<dt id="eds_cubetools.CubeFile">
+<em class="property">class </em><code class="sig-prename descclassname">eds_cubetools.</code><code class="sig-name descname">CubeFile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">srcname</span></em>, <em class="sig-param"><span class="n">const</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eds_cubetools.html#CubeFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eds_cubetools.CubeFile" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Object which mimics a cube file opened as a file object 
+by returning output in the correct format, matching the 
+metadata of the source cube file and replacing volumetric
+data with static data provided as arg to the constructor. 
+Doesn’t copy atoms metadata, retains number of atoms, but
+returns dummy atoms
+Mimics file object’s readline method.</p>
+<dl class="simple">
+<dt>params:</dt><dd><p>srcname: source file to copy metadata from
+const: numeric value to return instead of volumetric data</p>
+</dd>
+</dl>
+<p>returns: CubeFile object</p>
+<dl class="py method">
+<dt id="eds_cubetools.CubeFile.readline">
+<code class="sig-name descname">readline</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/eds_cubetools.html#CubeFile.readline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eds_cubetools.CubeFile.readline" title="Permalink to this definition"></a></dt>
+<dd><p>Mimic readline method of file object with cube file opened</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="eds_cubetools.read_cube">
+<code class="sig-prename descclassname">eds_cubetools.</code><code class="sig-name descname">read_cube</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fname</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eds_cubetools.html#read_cube"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eds_cubetools.read_cube" title="Permalink to this definition"></a></dt>
+<dd><p>Read cube file into numpy array</p>
+<dl class="simple">
+<dt>params:</dt><dd><p>fname: filename of cube file</p>
+</dd>
+</dl>
+<p>returns: (data: np.array, metadata: dict)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="eds_cubetools.read_cube_reshape">
+<code class="sig-prename descclassname">eds_cubetools.</code><code class="sig-name descname">read_cube_reshape</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fname</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eds_cubetools.html#read_cube_reshape"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eds_cubetools.read_cube_reshape" title="Permalink to this definition"></a></dt>
+<dd><p>Read cube file into numpy array</p>
+<dl class="simple">
+<dt>params:</dt><dd><p>fname: filename of cube file</p>
+</dd>
+</dl>
+<p>returns: (data: np.array, metadata: dict)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="eds_cubetools.read_imcube">
+<code class="sig-prename descclassname">eds_cubetools.</code><code class="sig-name descname">read_imcube</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rfname</span></em>, <em class="sig-param"><span class="n">ifname</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eds_cubetools.html#read_imcube"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eds_cubetools.read_imcube" title="Permalink to this definition"></a></dt>
+<dd><p>Convenience function to read in two cube files at once, 
+where one contains the real part and the other contains the 
+imag part. If only one filename given, other filename is inferred.</p>
+<dl class="simple">
+<dt>params:</dt><dd><p>rfname: filename of cube file of real part
+ifname: optional, filename of cube file of imag part</p>
+</dd>
+</dl>
+<p>returns: np.array (real part + j*imag part)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="eds_cubetools.write_cube">
+<code class="sig-prename descclassname">eds_cubetools.</code><code class="sig-name descname">write_cube</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">meta</span></em>, <em class="sig-param"><span class="n">fname</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eds_cubetools.html#write_cube"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eds_cubetools.write_cube" title="Permalink to this definition"></a></dt>
+<dd><p>Write volumetric data to cube file along</p>
+<dl>
+<dt>params:</dt><dd><p>data: volumetric data consisting real values
+meta: dict containing metadata with following keys</p>
+<blockquote>
+<div><p>atoms: list of atoms in the form (mass, [position])
+org: origin
+xvec,yvec,zvec: lattice vector basis</p>
+</div></blockquote>
+<p>fname: filename of cubefile (existing files overwritten)</p>
+</dd>
+</dl>
+<p>returns: None</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="eds_cubetools.write_imcube">
+<code class="sig-prename descclassname">eds_cubetools.</code><code class="sig-name descname">write_imcube</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">meta</span></em>, <em class="sig-param"><span class="n">rfname</span></em>, <em class="sig-param"><span class="n">ifname</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eds_cubetools.html#write_imcube"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eds_cubetools.write_imcube" title="Permalink to this definition"></a></dt>
+<dd><p>Convenience function to write two cube files from complex valued 
+volumetric data, one for the real part and one for the imaginary part.
+Data about atoms, origin and lattice vectors are kept same for both.
+If only one filename given, other filename is inferred.</p>
+<dl>
+<dt>params: </dt><dd><p>data: volumetric data consisting complex values
+meta: dict containing metadata with following keys</p>
+<blockquote>
+<div><p>atoms: list of atoms in the form (mass, [position])
+org: origin
+xvec,yvec,zvec: lattice vector basis</p>
+</div></blockquote>
+<p>rfname: filename of cube file containing real part
+ifname: optional, filename of cube file containing imag part</p>
+</dd>
+</dl>
+<p>returns: None</p>
+</dd></dl>
+
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="eds_quantification.html" class="btn btn-neutral float-left" title="eds_quantification module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Inigo Iribarren, Goar Sanchez-Sanz, Ibon Alkorta, Jose Elguero, Cristina Trujillo.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

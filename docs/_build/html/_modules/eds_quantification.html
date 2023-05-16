@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eds_quantification &mdash; Electron Density Shift (EDS) quantification 1.0 documentation</title><link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Electron Density Shift (EDS) quantification
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">scr</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Electron Density Shift (EDS) quantification</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Module code</a></li>
+      <li class="breadcrumb-item active">eds_quantification</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for eds_quantification</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Description:</span>
+<span class="sd">    This script quantifies the Electron Density Shift (EDS) calculated with </span>
+<span class="sd">    Gaussian and contained in a cube file.</span>
+
+<span class="sd">    The EDS is calculated using the eds_gaussian.sh script</span>
+
+<span class="sd">Dependencies:</span>
+<span class="sd">    numpy</span>
+<span class="sd">    pandas</span>
+<span class="sd">    glob</span>
+<span class="sd">    itertools</span>
+
+<span class="sd">Usage:</span>
+<span class="sd">    python3 eds_quatification -f &lt;filename&gt; -c &lt;cutoff&gt; -a</span>
+
+<span class="sd">Arguments:</span>
+<span class="sd">    &lt;filename&gt; (str): Path to the EDS cube file.</span>
+<span class="sd">    &lt;cutoff&gt; (float): Cutoff for quantifying EDS in</span>
+<span class="sd">    &lt;a&gt; (boolean): Select for quantify all the cub files in the working directory</span>
+
+<span class="sd">Author information:</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s1">&#39;Inigo Iribarren&#39;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s1">&#39;iribarri@tcd.ie&#39;</span>
+<span class="n">__version__</span> <span class="o">=</span> <span class="s1">&#39;1.0&#39;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s1">&#39;MIT&#39;</span>
+
+<span class="c1"># Import necessary libraries</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">from</span> <span class="nn">eds_cubetools</span> <span class="kn">import</span> <span class="o">*</span>
+
+
+<div class="viewcode-block" id="cube_parser"><a class="viewcode-back" href="../eds_quantification.html#eds_quantification.cube_parser">[docs]</a><span class="k">def</span> <span class="nf">cube_parser</span><span class="p">(</span><span class="n">cube_file</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extracts all the needed information to quantify the EDS form a </span>
+<span class="sd">    selected cube file </span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        cube_file (str): Name of the cube file to extract the data from </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        grid_df (pandas.DataFrame): dataframe with all the grid coordinatees and rho values </span>
+<span class="sd">        cub_vol (float): volume of individual cube forming the grid</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Read the cube file and storage the date in two different ways</span>
+    <span class="c1"># Store EDS at each point as 1 dimmension array</span>
+    <span class="n">rho</span><span class="p">,</span> <span class="n">meta_data</span><span class="p">,</span> <span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">nz</span> <span class="o">=</span> <span class="n">read_cube</span><span class="p">(</span><span class="n">cube_file</span><span class="p">)</span>
+
+    <span class="c1"># Extracting cage and grid size</span>
+    <span class="n">org_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">meta_data</span><span class="p">[</span><span class="s1">&#39;org&#39;</span><span class="p">])</span> 
+    <span class="n">xorg</span><span class="p">,</span> <span class="n">yorg</span><span class="p">,</span> <span class="n">zorg</span> <span class="o">=</span> <span class="n">org_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">org_list</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">org_list</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="c1"># Origin of grid</span>
+
+    <span class="n">xstep</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">meta_data</span><span class="p">[</span><span class="s1">&#39;xvec&#39;</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span> 
+    <span class="n">ystep</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">meta_data</span><span class="p">[</span><span class="s1">&#39;yvec&#39;</span><span class="p">])[</span><span class="mi">1</span><span class="p">]</span> 
+    <span class="n">zstep</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">meta_data</span><span class="p">[</span><span class="s1">&#39;zvec&#39;</span><span class="p">])[</span><span class="mi">2</span><span class="p">]</span> 
+
+    <span class="n">cub_vol</span> <span class="o">=</span> <span class="n">xstep</span> <span class="o">*</span> <span class="n">ystep</span> <span class="o">*</span> <span class="n">zstep</span> <span class="c1"># Volume of a single cube in the grid</span>
+
+    <span class="c1"># Coordinates of all the grid points and their density</span>
+    <span class="n">xcoord</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">xorg</span><span class="p">,</span> <span class="n">xorg</span> <span class="o">+</span> <span class="n">xstep</span> <span class="o">*</span> <span class="n">nx</span><span class="p">,</span> <span class="n">xstep</span><span class="p">)</span>
+    <span class="n">ycoord</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">yorg</span><span class="p">,</span> <span class="n">yorg</span> <span class="o">+</span> <span class="n">ystep</span> <span class="o">*</span> <span class="n">ny</span><span class="p">,</span> <span class="n">ystep</span><span class="p">)</span>
+    <span class="n">zcoord</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">zorg</span><span class="p">,</span> <span class="n">zorg</span> <span class="o">+</span> <span class="n">zstep</span> <span class="o">*</span> <span class="n">nz</span><span class="p">,</span> <span class="n">zstep</span><span class="p">)</span>
+
+    <span class="c1"># This is needed to delete extra points that can be created at the end due </span>
+    <span class="c1"># to accuracy issues </span>
+    <span class="k">if</span> <span class="p">(</span> <span class="n">xcoord</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="n">nx</span> <span class="p">):</span>
+        <span class="n">xcoord</span> <span class="o">=</span> <span class="n">xcoord</span><span class="p">[:</span><span class="n">nx</span><span class="o">-</span><span class="n">xcoord</span><span class="o">.</span><span class="n">size</span><span class="p">]</span>
+    <span class="k">if</span> <span class="p">(</span> <span class="n">ycoord</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="n">ny</span> <span class="p">):</span>
+        <span class="n">ycoord</span> <span class="o">=</span> <span class="n">ycoord</span><span class="p">[:</span><span class="n">ny</span><span class="o">-</span><span class="n">ycoord</span><span class="o">.</span><span class="n">size</span><span class="p">]</span>
+    <span class="k">if</span> <span class="p">(</span> <span class="n">zcoord</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="n">nz</span> <span class="p">):</span>
+        <span class="n">zcoord</span> <span class="o">=</span> <span class="n">zcoord</span><span class="p">[:</span><span class="n">nz</span><span class="o">-</span><span class="n">zcoord</span><span class="o">.</span><span class="n">size</span><span class="p">]</span>
+    
+    <span class="c1"># Extract the grid points coordinates and the rho value</span>
+    <span class="n">grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">rho</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span> 
+            <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="n">xcoord</span><span class="p">,</span> <span class="n">ycoord</span><span class="p">,</span> <span class="n">zcoord</span><span class="p">))])</span>
+    <span class="n">grid_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="s1">&#39;y&#39;</span><span class="p">,</span><span class="s1">&#39;z&#39;</span><span class="p">,</span><span class="s1">&#39;rho&#39;</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">grid_df</span><span class="p">,</span> <span class="n">cub_vol</span></div>
+
+<div class="viewcode-block" id="calc_eds_total"><a class="viewcode-back" href="../eds_quantification.html#eds_quantification.calc_eds_total">[docs]</a><span class="k">def</span> <span class="nf">calc_eds_total</span><span class="p">(</span><span class="n">rho_df</span><span class="p">,</span> <span class="n">cub_vol</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates the total value of the EDS in the file</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        rho_df (pandas.DataFrame): Pandas DataFrame containing the grid points</span>
+<span class="sd">        coordinates and the rho values. Columns:</span>
+<span class="sd">            - x (float): X coordinates</span>
+<span class="sd">            - y (float): Y coordinates</span>
+<span class="sd">            - z (float): Z coordinates</span>
+<span class="sd">            - rho (float): EDS values at the gridpoint</span>
+<span class="sd">        cub_vol (float): Volume of each individual cube in the grid</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        eds_total_pos (float): total value of all the positive EDS points</span>
+<span class="sd">        eds_total_neg (float): total value of all the positive EDS points</span>
+<span class="sd">        eds_total (float): total value of all the EDS points</span>
+<span class="sd">        eds_error (float): error between EDS pos and neg</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">eds_total_pos</span> <span class="o">=</span> <span class="n">rho_df</span><span class="p">[</span><span class="n">rho_df</span><span class="p">[</span><span class="s1">&#39;rho&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">][</span><span class="s1">&#39;rho&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">cub_vol</span>
+    <span class="n">eds_total_neg</span> <span class="o">=</span> <span class="n">rho_df</span><span class="p">[</span><span class="n">rho_df</span><span class="p">[</span><span class="s1">&#39;rho&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">][</span><span class="s1">&#39;rho&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">cub_vol</span>
+    <span class="n">eds_total</span> <span class="o">=</span> <span class="n">rho_df</span><span class="p">[</span><span class="s1">&#39;rho&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">cub_vol</span>
+    <span class="n">eds_error</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">eds_total</span> <span class="o">/</span> <span class="p">(</span> <span class="n">eds_total_pos</span> <span class="o">-</span> <span class="n">eds_total_neg</span> <span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">eds_total_pos</span><span class="p">,</span> <span class="n">eds_total_neg</span><span class="p">,</span> <span class="n">eds_total</span><span class="p">,</span> <span class="n">eds_error</span></div>
+
+<div class="viewcode-block" id="calc_eds_cutoff"><a class="viewcode-back" href="../eds_quantification.html#eds_quantification.calc_eds_cutoff">[docs]</a><span class="k">def</span> <span class="nf">calc_eds_cutoff</span><span class="p">(</span><span class="n">rho_df</span><span class="p">,</span> <span class="n">cub_vol</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates the value of the EDS in the file at a certain cutoff</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        rho_df (pandas.DataFrame): Pandas DataFrame containing the grid points</span>
+<span class="sd">        coordinates and the rho values. Columns:</span>
+<span class="sd">            - x (float): X coordinates</span>
+<span class="sd">            - y (float): Y coordinates</span>
+<span class="sd">            - z (float): Z coordinates</span>
+<span class="sd">            - rho (float): EDS values at the gridpoint</span>
+<span class="sd">        cub_vol (float): Volume of each individual cube in the grid</span>
+<span class="sd">        cutoff (float): Cutoff for the EDS calculations.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        eds_cutoff_pos (float): cutoff value of all the positive EDS points</span>
+<span class="sd">        eds_cutoff_neg (float): cutoff value of all the positive EDS points</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">eds_cutoff_pos</span> <span class="o">=</span> <span class="n">rho_df</span><span class="p">[</span><span class="n">rho_df</span><span class="p">[</span><span class="s1">&#39;rho&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">cutoff</span><span class="p">][</span><span class="s1">&#39;rho&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">cub_vol</span>
+    <span class="n">eds_cutoff_neg</span> <span class="o">=</span> <span class="n">rho_df</span><span class="p">[</span><span class="n">rho_df</span><span class="p">[</span><span class="s1">&#39;rho&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">cutoff</span><span class="p">][</span><span class="s1">&#39;rho&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">cub_vol</span>
+
+    <span class="k">return</span> <span class="n">eds_cutoff_pos</span><span class="p">,</span> <span class="n">eds_cutoff_neg</span></div>
+
+<span class="c1"># Multiple EDS </span>
+<div class="viewcode-block" id="multiple_eds"><a class="viewcode-back" href="../eds_quantification.html#eds_quantification.multiple_eds">[docs]</a><span class="k">def</span> <span class="nf">multiple_eds</span><span class="p">(</span><span class="n">cutoff</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Quantifies the EDS of all the &lt;name&gt;_final.cub files in the working directory</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        cutoff (float): Cutoff for the EDS calculations.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        df_eds (pandas.Dataframe): Dataframe with all EDS data from the files in the working directory</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;./*final.cub&#39;</span><span class="p">)</span>
+    <span class="n">files</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+
+    <span class="n">df_columns</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;File_name&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;EDS_total_positive&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;EDS_total_negative&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;EDS_total&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;EDS_error&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;EDS_cutoff_positive&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;EDS_cutoff_negative&#39;</span>
+            <span class="p">]</span>
+    <span class="n">eds_data</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">eds_total_pos</span><span class="p">,</span> <span class="n">eds_total_neg</span><span class="p">,</span> <span class="n">eds_total</span><span class="p">,</span> <span class="n">eds_error</span><span class="p">,</span> <span class="n">eds_cutoff_pos</span><span class="p">,</span> <span class="n">eds_cutoff_neg</span> <span class="o">=</span> <span class="n">main</span><span class="p">(</span><span class="n">file</span><span class="p">,</span><span class="n">cutoff</span><span class="p">)</span>
+        
+        <span class="n">eds_data</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">name</span><span class="p">,</span> <span class="n">eds_total_pos</span><span class="p">,</span> <span class="n">eds_total_neg</span><span class="p">,</span> <span class="n">eds_total</span><span class="p">,</span> <span class="n">eds_error</span><span class="p">,</span> <span class="n">eds_cutoff_pos</span><span class="p">,</span> <span class="n">eds_cutoff_neg</span><span class="p">])</span>
+
+    <span class="n">df_eds</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">eds_data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">df_columns</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">df_eds</span></div>
+
+<span class="c1"># Single EDS function</span>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../eds_quantification.html#eds_quantification.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">cube_file</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Quantifies the EDS of a selected cub file in the working directory</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        cube_file (str): Name of the cub file to calculate EDS from</span>
+<span class="sd">        cutoff (float): Cutoff for the EDS calculations.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        df_eds (pandas.Dataframe): Dataframe with all EDS data from the files in the working directory</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rho_data</span><span class="p">,</span> <span class="n">cub_vol</span> <span class="o">=</span> <span class="n">cube_parser</span><span class="p">(</span><span class="n">cube_file</span><span class="p">)</span>
+
+    <span class="n">eds_total_pos</span><span class="p">,</span> <span class="n">eds_total_neg</span><span class="p">,</span> <span class="n">eds_total</span><span class="p">,</span> <span class="n">eds_error</span> <span class="o">=</span> <span class="n">calc_eds_total</span><span class="p">(</span><span class="n">rho_data</span><span class="p">,</span><span class="n">cub_vol</span><span class="p">)</span>
+    <span class="n">eds_cutoff_pos</span><span class="p">,</span> <span class="n">eds_cutoff_neg</span> <span class="o">=</span> <span class="n">calc_eds_cutoff</span><span class="p">(</span><span class="n">rho_data</span><span class="p">,</span><span class="n">cub_vol</span><span class="p">,</span><span class="n">cutoff</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">eds_total_pos</span><span class="p">,</span> <span class="n">eds_total_neg</span><span class="p">,</span> <span class="n">eds_total</span><span class="p">,</span> <span class="n">eds_error</span><span class="p">,</span> <span class="n">eds_cutoff_pos</span><span class="p">,</span> <span class="n">eds_cutoff_neg</span></div>
+
+
+<span class="c1"># Call the main function</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="c1">#  Parse arguments</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s1">&#39;This script quantifies the Electron Density Shift </span><span class="se">\</span>
+<span class="s1">                    (EDS) calculated with Gaussian and contained in a cube </span><span class="se">\</span>
+<span class="s1">                    file. The EDS is calculated using the eds_gaussian.sh script&#39;</span><span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-f&#39;</span><span class="p">,</span><span class="s1">&#39;--filename&#39;</span><span class="p">,</span>
+                        <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Filename of the cube file containing the EDS&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-c&#39;</span><span class="p">,</span><span class="s1">&#39;--cutoff&#39;</span><span class="p">,</span>
+                        <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Cutoff for EDS value&#39;</span><span class="p">,</span>
+                        <span class="n">default</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-a&#39;</span><span class="p">,</span><span class="s1">&#39;--all&#39;</span><span class="p">,</span>
+                        <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Use it if you want to caculate the EDS of all the</span><span class="se">\</span>
+<span class="s1">                            cube files in the current directory.</span><span class="se">\</span>
+<span class="s1">                            The files must be called &lt;name&gt;_final.cub&#39;</span><span class="p">,</span>
+                        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+    <span class="n">filename</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">filename</span>
+    <span class="n">cutoff</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">cutoff</span>
+    <span class="n">eds_all</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">all</span>
+    
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">eds_all</span> <span class="ow">and</span> <span class="n">filename</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Filename has to be specified or &quot;-a&quot; option selected &#39;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">eds_all</span> <span class="ow">and</span> <span class="n">filename</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Filename cannot be specified when &quot;-a&quot; option is selected &#39;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="n">eds_all</span> <span class="ow">and</span> <span class="n">filename</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The file &#39;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">&#39; does not exist&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">eds_total_pos</span><span class="p">,</span> <span class="n">eds_total_neg</span><span class="p">,</span> <span class="n">eds_total</span><span class="p">,</span> <span class="n">eds_error</span><span class="p">,</span> <span class="n">eds_cutoff_pos</span><span class="p">,</span> <span class="n">eds_cutoff_neg</span> <span class="o">=</span> <span class="n">main</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="n">cutoff</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;EDS total positive: </span><span class="si">{</span><span class="n">eds_total_pos</span><span class="si">:</span><span class="s1">.6f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;EDS total negative: </span><span class="si">{</span><span class="n">eds_total_neg</span><span class="si">:</span><span class="s1">.6f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;EDS total: </span><span class="si">{</span><span class="n">eds_total</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;EDS total error: </span><span class="si">{</span><span class="n">eds_error</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">%&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;EDS cutoff positive: </span><span class="si">{</span><span class="n">eds_cutoff_pos</span><span class="si">:</span><span class="s1">.6f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;EDS cutoff negativee: </span><span class="si">{</span><span class="n">eds_cutoff_neg</span><span class="si">:</span><span class="s1">.6f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">eds_all</span> <span class="ow">and</span> <span class="n">filename</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">eds_df</span> <span class="o">=</span> <span class="n">multiple_eds</span><span class="p">(</span><span class="n">cutoff</span><span class="p">)</span>
+            <span class="n">eds_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;EDS_data.csv&#39;</span><span class="p">,</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Inigo Iribarren, Goar Sanchez-Sanz, Ibon Alkorta, Jose Elguero, Cristina Trujillo.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
