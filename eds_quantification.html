@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eds_quantification module &mdash; Electron Density Shift (EDS) quantification 1.0 documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="eds_cubetools module" href="eds_cubetools.html" />
+    <link rel="prev" title="scr" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Electron Density Shift (EDS) quantification
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">scr</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">eds_quantification module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eds_cubetools.html">eds_cubetools module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Electron Density Shift (EDS) quantification</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">scr</a></li>
+      <li class="breadcrumb-item active">eds_quantification module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/eds_quantification.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="module-eds_quantification">
+<span id="eds-quantification-module"></span><h1>eds_quantification module<a class="headerlink" href="#module-eds_quantification" title="Permalink to this headline"></a></h1>
+<dl>
+<dt>Description:</dt><dd><p>This script quantifies the Electron Density Shift (EDS) calculated with 
+Gaussian and contained in a cube file.</p>
+<p>The EDS is calculated using the eds_gaussian.sh script</p>
+</dd>
+<dt>Dependencies:</dt><dd><p>numpy
+pandas
+glob
+itertools</p>
+</dd>
+<dt>Usage:</dt><dd><p>python3 eds_quatification -f &lt;filename&gt; -c &lt;cutoff&gt; -a</p>
+</dd>
+<dt>Arguments:</dt><dd><p>&lt;filename&gt; (str): Path to the EDS cube file.
+&lt;cutoff&gt; (float): Cutoff for quantifying EDS in
+&lt;a&gt; (boolean): Select for quantify all the cub files in the working directory</p>
+</dd>
+</dl>
+<p>Author information:</p>
+<dl class="py function">
+<dt id="eds_quantification.calc_eds_cutoff">
+<code class="sig-prename descclassname">eds_quantification.</code><code class="sig-name descname">calc_eds_cutoff</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rho_df</span></em>, <em class="sig-param"><span class="n">cub_vol</span></em>, <em class="sig-param"><span class="n">cutoff</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eds_quantification.html#calc_eds_cutoff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eds_quantification.calc_eds_cutoff" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates the value of the EDS in the file at a certain cutoff</p>
+<dl>
+<dt>Args:</dt><dd><p>rho_df (pandas.DataFrame): Pandas DataFrame containing the grid points
+coordinates and the rho values. Columns:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>x (float): X coordinates</p></li>
+<li><p>y (float): Y coordinates</p></li>
+<li><p>z (float): Z coordinates</p></li>
+<li><p>rho (float): EDS values at the gridpoint</p></li>
+</ul>
+</div></blockquote>
+<p>cub_vol (float): Volume of each individual cube in the grid
+cutoff (float): Cutoff for the EDS calculations.</p>
+</dd>
+<dt>Returns:</dt><dd><p>eds_cutoff_pos (float): cutoff value of all the positive EDS points
+eds_cutoff_neg (float): cutoff value of all the positive EDS points</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="eds_quantification.calc_eds_total">
+<code class="sig-prename descclassname">eds_quantification.</code><code class="sig-name descname">calc_eds_total</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rho_df</span></em>, <em class="sig-param"><span class="n">cub_vol</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eds_quantification.html#calc_eds_total"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eds_quantification.calc_eds_total" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates the total value of the EDS in the file</p>
+<dl>
+<dt>Args:</dt><dd><p>rho_df (pandas.DataFrame): Pandas DataFrame containing the grid points
+coordinates and the rho values. Columns:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>x (float): X coordinates</p></li>
+<li><p>y (float): Y coordinates</p></li>
+<li><p>z (float): Z coordinates</p></li>
+<li><p>rho (float): EDS values at the gridpoint</p></li>
+</ul>
+</div></blockquote>
+<p>cub_vol (float): Volume of each individual cube in the grid</p>
+</dd>
+<dt>Returns:</dt><dd><p>eds_total_pos (float): total value of all the positive EDS points
+eds_total_neg (float): total value of all the positive EDS points
+eds_total (float): total value of all the EDS points
+eds_error (float): error between EDS pos and neg</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="eds_quantification.cube_parser">
+<code class="sig-prename descclassname">eds_quantification.</code><code class="sig-name descname">cube_parser</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cube_file</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eds_quantification.html#cube_parser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eds_quantification.cube_parser" title="Permalink to this definition"></a></dt>
+<dd><p>Extracts all the needed information to quantify the EDS form a 
+selected cube file</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>cube_file (str): Name of the cube file to extract the data from</p>
+</dd>
+<dt>Returns:</dt><dd><p>grid_df (pandas.DataFrame): dataframe with all the grid coordinatees and rho values 
+cub_vol (float): volume of individual cube forming the grid</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="eds_quantification.main">
+<code class="sig-prename descclassname">eds_quantification.</code><code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cube_file</span></em>, <em class="sig-param"><span class="n">cutoff</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eds_quantification.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eds_quantification.main" title="Permalink to this definition"></a></dt>
+<dd><p>Quantifies the EDS of a selected cub file in the working directory</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>cube_file (str): Name of the cub file to calculate EDS from
+cutoff (float): Cutoff for the EDS calculations.</p>
+</dd>
+<dt>Returns:</dt><dd><p>df_eds (pandas.Dataframe): Dataframe with all EDS data from the files in the working directory</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="eds_quantification.multiple_eds">
+<code class="sig-prename descclassname">eds_quantification.</code><code class="sig-name descname">multiple_eds</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cutoff</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eds_quantification.html#multiple_eds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eds_quantification.multiple_eds" title="Permalink to this definition"></a></dt>
+<dd><p>Quantifies the EDS of all the &lt;name&gt;_final.cub files in the working directory</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>cutoff (float): Cutoff for the EDS calculations.</p>
+</dd>
+<dt>Returns:</dt><dd><p>df_eds (pandas.Dataframe): Dataframe with all EDS data from the files in the working directory</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-left" title="scr" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="eds_cubetools.html" class="btn btn-neutral float-right" title="eds_cubetools module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Inigo Iribarren, Goar Sanchez-Sanz, Ibon Alkorta, Jose Elguero, Cristina Trujillo.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

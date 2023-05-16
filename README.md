@@ -29,6 +29,10 @@ python3 eds_quatification -f <filename> -c <cutoff> -a
 
 where `<filename>` is the path to the EDS cube file and `<cutoff>` is a float value representing the cutoff for the EDS calculations and `<a>` is an option to calculate the EDS for all the cub files in the working directory.
 
+## Documentation
+
+[Documentation](./docs/_build/html/index.html)
+
 ## Arguments
 
 The script takes the following arguments:
