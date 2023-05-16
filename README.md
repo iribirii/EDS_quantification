@@ -6,7 +6,7 @@ This script is designed to quantify the Electron Density Shift (EDS) calculated 
 
 This code is released under the MIT license. Commercial use, Modification, Distribution and Private use are all permitted. 
 The use of theese scripts can be acknowledged with the following citation: 
-Iribarren, Inigo, Sanchez-Sanz, Goar, Alkorta, Ibon, Trujillo, Cristina, *"Evaluation of electron density shifts in noncovalent interactions."* The Journal of Physical Chemistry A 125.22 (2021): 4741-4749. [DOI:10.1021/acs.jpca.1c00830](https://pubs.acs.org/doi/full/10.1021/acs.jpca.1c00830)
+Iribarren, Iñigo, Sanchez-Sanz, Goar, Alkorta, Ibon, Elguero, José, Trujillo, Cristina, *"Evaluation of electron density shifts in noncovalent interactions."* The Journal of Physical Chemistry A 125.22 (2021): 4741-4749. [DOI:10.1021/acs.jpca.1c00830](https://pubs.acs.org/doi/full/10.1021/acs.jpca.1c00830)
 
 ## Dependencies
 
