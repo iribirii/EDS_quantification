@@ -1,4 +1,4 @@
-# EDS_quantification
+![EDS quantification cover](./docs/cover.png)
 
 This script is designed to quantify the Electron Density Shift (EDS) calculated with Gaussian and contained in a cube file. The script calculates the EDS using the `eds_gaussian.sh` script and returns the total value of the EDS in the file and its value at a certain cutoff.
 
